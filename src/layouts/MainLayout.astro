@@ -16,6 +16,14 @@ const { title = 'BloomFit' } = Astro.props;
     <meta name="description" content="Tu flor crece cuando tú creces" />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
+    <!-- Apply theme from localStorage before first paint to prevent flash -->
+    <script is:inline>
+      const t = localStorage.getItem('bloomfit-theme') || 'sakura';
+      document.documentElement.setAttribute('data-theme', t);
+    </script>
   </head>
   <body>
     <slot />

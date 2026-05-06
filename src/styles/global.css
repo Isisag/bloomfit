@@ -1,1 +1,16 @@
 @import "tailwindcss";
+@import "./themes.css";
+
+body {
+  font-family: 'Quicksand', 'Nunito', -apple-system, sans-serif;
+  font-weight: 500;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.5s ease, color 0.3s ease;
+}
+
+/* Smooth theme transitions on background/border, skipped on interactive elements */
+*:not(button):not(a):not(input):not(select):not(textarea) {
+  transition: background-color 0.5s ease, border-color 0.3s ease;
+}
