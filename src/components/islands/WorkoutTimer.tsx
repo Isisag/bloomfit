@@ -197,9 +197,6 @@ export default function WorkoutTimer() {
   const stateRef     = useRef<TimerState>('ready');
   const targetMsRef  = useRef(0);
 
-  stateRef.current    = timerState;
-  targetMsRef.current = targetMs;
-
   const activeMode  = MODES.find((m) => m.id === modeId) ?? MODES[0];
   const targetMs    = modeId === 'free' ? customMs : activeMode.targetMs;
   const isCountdown = targetMs > 0;
@@ -208,6 +205,10 @@ export default function WorkoutTimer() {
   const isRunning   = timerState === 'running';
   const isPaused    = timerState === 'paused';
   const isCompleted = timerState === 'completed';
+
+  // Keep refs in sync after each commit (never during render)
+  useEffect(() => { stateRef.current = timerState; });
+  useEffect(() => { targetMsRef.current = targetMs; });
 
   // ── Worker ─────────────────────────────────────────────────────────────────
   useEffect(() => {
