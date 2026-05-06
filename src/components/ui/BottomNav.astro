@@ -1,5 +1,5 @@
 ---
-type NavItem = 'home' | 'goals' | 'garden' | 'me';
+type NavItem = 'home' | 'train' | 'garden' | 'me';
 
 interface Props {
   active?: NavItem;
@@ -7,11 +7,21 @@ interface Props {
 
 const { active = 'home' } = Astro.props;
 
-const items: { id: NavItem; icon: string; label: string; href: string }[] = [
-  { id: 'home',   icon: '🏡', label: 'Home',   href: '/' },
-  { id: 'goals',  icon: '🎯', label: 'Goals',  href: '/goals' },
-  { id: 'garden', icon: '🌸', label: 'Garden', href: '/garden' },
-  { id: 'me',     icon: '👤', label: 'Me',     href: '/me' },
+// Palette (matches icons.jsx)
+const stroke = '#4A3D4D';
+const pinkMid = '#FFB7C5';
+const lavMid = '#D5BDF5';
+const lavSoft = '#EBDDFC';
+const peachSoft = '#FFE0CC';
+const peachMid = '#FFC299';
+const butterMid = '#FFE38A';
+const white = '#FFFFFF';
+
+const items: { id: NavItem; label: string; href: string }[] = [
+  { id: 'home',   label: 'Home',   href: '/' },
+  { id: 'train',  label: 'Train',  href: '/workout/register' },
+  { id: 'garden', label: 'Garden', href: '/garden' },
+  { id: 'me',     label: 'Me',     href: '/me' },
 ];
 ---
 
@@ -41,10 +51,43 @@ const items: { id: NavItem; icon: string; label: string; href: string }[] = [
           }
           aria-current={isActive ? 'page' : undefined}
         >
-          <span class="text-xl" style={isActive ? '' : 'filter: grayscale(0.3)'}>{item.icon}</span>
+          <span style={isActive ? 'display:flex' : 'display:flex; opacity:0.55'}>
+            {item.id === 'home' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 11 L12 4 L20 11 V20 H4 Z" fill={peachSoft} stroke={stroke} stroke-width="1.4" stroke-linejoin="round"/>
+                <path d="M9.5 20 V14 H14.5 V20" fill={peachMid} stroke={stroke} stroke-width="1.4" stroke-linejoin="round"/>
+                <circle cx="12" cy="8.5" r="0.8" fill={stroke}/>
+              </svg>
+            )}
+            {item.id === 'train' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 20 Q4 14 4 9 Q4 5 8 5 Q10.5 5 12 7.5 Q13.5 5 16 5 Q20 5 20 9 Q20 14 12 20 Z"
+                  fill={pinkMid} stroke={stroke} stroke-width="1.4" stroke-linejoin="round"/>
+                <path d="M7 10 H10 L11 8 L13 13 L14 10 H17"
+                  stroke={white} stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            )}
+            {item.id === 'garden' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+                <ellipse cx="12" cy="6" rx="3" ry="4" fill={pinkMid} stroke={stroke} stroke-width="1.2"/>
+                <ellipse cx="12" cy="18" rx="3" ry="4" fill={pinkMid} stroke={stroke} stroke-width="1.2"/>
+                <ellipse cx="6" cy="12" rx="4" ry="3" fill={pinkMid} stroke={stroke} stroke-width="1.2"/>
+                <ellipse cx="18" cy="12" rx="4" ry="3" fill={pinkMid} stroke={stroke} stroke-width="1.2"/>
+                <circle cx="12" cy="12" r="3" fill={butterMid} stroke={stroke} stroke-width="1.2"/>
+              </svg>
+            )}
+            {item.id === 'me' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="8" r="4" fill={lavMid} stroke={stroke} stroke-width="1.4"/>
+                <path d="M4 21 Q4 14 12 14 Q20 14 20 21 Z" fill={lavSoft} stroke={stroke} stroke-width="1.4" stroke-linejoin="round"/>
+                <circle cx="10.5" cy="8" r="0.5" fill={stroke}/>
+                <circle cx="13.5" cy="8" r="0.5" fill={stroke}/>
+              </svg>
+            )}
+          </span>
           <span
             class="text-xs font-bold"
-            style={isActive ? 'color: #FF69B4;' : 'color: #8E7B92;'}
+            style={isActive ? 'color: #FF8FAB;' : 'color: #8E7B92;'}
           >{item.label}</span>
         </a>
       );

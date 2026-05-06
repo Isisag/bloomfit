@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { signUpWithEmail, loginWithEmail, loginWithGoogle, mapAuthError } from '@/lib/auth';
+import { BloomIcon } from './BloomIcons';
 
 type Mode = 'login' | 'register';
 
@@ -119,7 +120,7 @@ export default function AuthForm() {
                   border: '2px solid #FFD4E0',
                 }}
               >
-                <span className="text-base">✉️</span>
+                <BloomIcon name="mail" size={20} />
                 <input
                   type="email"
                   value={email}
@@ -147,7 +148,7 @@ export default function AuthForm() {
                   border: '2px solid #FFD4E0',
                 }}
               >
-                <span className="text-base">🔒</span>
+                <BloomIcon name="lock" size={20} />
                 <input
                   type="password"
                   value={password}
