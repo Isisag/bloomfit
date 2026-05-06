@@ -22,8 +22,8 @@ export default function AuthForm() {
         await loginWithEmail(email, password);
       }
       window.location.href = '/';
-    } catch (err: any) {
-      setError(mapAuthError(err.code));
+    } catch (err) {
+      setError(mapAuthError((err as { code: string }).code));
     } finally {
       setLoading(false);
     }
@@ -35,8 +35,8 @@ export default function AuthForm() {
     try {
       await loginWithGoogle();
       window.location.href = '/';
-    } catch (err: any) {
-      const msg = mapAuthError(err.code);
+    } catch (err) {
+      const msg = mapAuthError((err as { code: string }).code);
       if (msg) setError(msg);
     } finally {
       setLoading(false);
