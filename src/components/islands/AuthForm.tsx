@@ -44,91 +44,193 @@ export default function AuthForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-rose-50 px-4">
-      <div className="w-full max-w-sm bg-white rounded-3xl shadow-sm border border-rose-100 p-8">
+    <div
+      className="min-h-screen flex items-center justify-center px-6"
+      style={{ background: 'linear-gradient(180deg, #FFF0F6 0%, #F4E4FF 100%)' }}
+    >
+      <div className="w-full max-w-sm">
 
+        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="text-4xl mb-2">🌸</div>
-          <h1 className="text-2xl font-bold text-rose-400">BloomFit</h1>
-          <p className="text-sm text-rose-300 mt-1">Tu flor crece cuando tú creces</p>
-        </div>
-
-        <div className="flex rounded-2xl bg-rose-50 p-1 mb-6">
-          <button
-            onClick={() => { setMode('login'); setError(''); }}
-            className={`flex-1 py-2 text-sm font-medium rounded-xl transition-all ${
-              mode === 'login'
-                ? 'bg-white text-rose-500 shadow-sm'
-                : 'text-rose-300 hover:text-rose-400'
-            }`}
-          >
-            Ingresar
-          </button>
-          <button
-            onClick={() => { setMode('register'); setError(''); }}
-            className={`flex-1 py-2 text-sm font-medium rounded-xl transition-all ${
-              mode === 'register'
-                ? 'bg-white text-rose-500 shadow-sm'
-                : 'text-rose-300 hover:text-rose-400'
-            }`}
-          >
-            Registrarse
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-rose-400 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="tu@email.com"
-              className="w-full px-4 py-3 rounded-2xl border border-rose-100 bg-rose-50 text-rose-800 placeholder:text-rose-200 focus:outline-none focus:ring-2 focus:ring-rose-200 text-sm"
-            />
+          <div className="text-6xl mb-3" style={{ filter: 'drop-shadow(0 8px 16px rgba(255,105,180,0.25))' }}>
+            🌸
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-rose-400 mb-1">Contraseña</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 rounded-2xl border border-rose-100 bg-rose-50 text-rose-800 placeholder:text-rose-200 focus:outline-none focus:ring-2 focus:ring-rose-200 text-sm"
-            />
+          <div className="text-xs font-bold tracking-widest mb-1" style={{ color: '#FF69B4', letterSpacing: '2px' }}>
+            ✿ BLOOMFIT ✿
           </div>
-
-          {error && (
-            <p className="text-xs text-red-400 bg-red-50 rounded-xl px-3 py-2">{error}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-rose-400 hover:bg-rose-500 text-white font-medium rounded-2xl transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {loading ? '...' : mode === 'login' ? 'Ingresar' : 'Crear cuenta'}
-          </button>
-        </form>
-
-        <div className="flex items-center my-5">
-          <div className="flex-1 border-t border-rose-100" />
-          <span className="px-3 text-xs text-rose-200">o</span>
-          <div className="flex-1 border-t border-rose-100" />
+          <h1 className="text-2xl font-bold" style={{ color: '#5A4A5C', letterSpacing: '-0.4px' }}>
+            {mode === 'login' ? 'Let\'s bloom again' : 'Start blooming'}
+          </h1>
+          <p className="text-sm mt-1" style={{ color: '#8E7B92' }}>
+            {mode === 'login' ? 'Tu flor te extrañó 🌷' : 'Tu flor te está esperando 🌱'}
+          </p>
         </div>
 
-        <button
-          onClick={handleGoogle}
-          disabled={loading}
-          className="w-full py-3 border border-rose-100 bg-white hover:bg-rose-50 text-rose-400 font-medium rounded-2xl transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+        {/* Card */}
+        <div
+          className="rounded-3xl p-6"
+          style={{
+            background: '#fff',
+            boxShadow: '0 8px 32px rgba(255, 105, 180, 0.12)',
+          }}
         >
-          <GoogleIcon />
-          Continuar con Google
-        </button>
+          {/* Mode tabs */}
+          <div
+            className="flex rounded-2xl p-1 mb-6"
+            style={{ background: '#FFF5F7' }}
+          >
+            <button
+              onClick={() => { setMode('login'); setError(''); }}
+              className="flex-1 py-2 text-sm font-bold rounded-xl transition-all"
+              style={{
+                background: mode === 'login' ? '#fff' : 'transparent',
+                color: mode === 'login' ? '#5A4A5C' : '#8E7B92',
+                boxShadow: mode === 'login' ? '0 2px 8px rgba(255,105,180,0.1)' : 'none',
+              }}
+            >
+              Ingresar
+            </button>
+            <button
+              onClick={() => { setMode('register'); setError(''); }}
+              className="flex-1 py-2 text-sm font-bold rounded-xl transition-all"
+              style={{
+                background: mode === 'register' ? '#fff' : 'transparent',
+                color: mode === 'register' ? '#5A4A5C' : '#8E7B92',
+                boxShadow: mode === 'register' ? '0 2px 8px rgba(255,105,180,0.1)' : 'none',
+              }}
+            >
+              Registrarse
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label
+                className="block text-xs font-bold mb-2 ml-1 tracking-wider uppercase"
+                style={{ color: '#FF69B4' }}
+              >
+                Email
+              </label>
+              <div
+                className="flex items-center gap-3 rounded-2xl px-4 py-3"
+                style={{
+                  background: '#fff',
+                  boxShadow: '0 4px 14px rgba(255, 105, 180, 0.08)',
+                  border: '2px solid #FFD4E0',
+                }}
+              >
+                <span className="text-base">✉️</span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="tu@email.com"
+                  className="flex-1 text-sm font-semibold bg-transparent outline-none"
+                  style={{ color: '#5A4A5C' }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                className="block text-xs font-bold mb-2 ml-1 tracking-wider uppercase"
+                style={{ color: '#FF69B4' }}
+              >
+                Contraseña
+              </label>
+              <div
+                className="flex items-center gap-3 rounded-2xl px-4 py-3"
+                style={{
+                  background: '#fff',
+                  boxShadow: '0 4px 14px rgba(255, 105, 180, 0.08)',
+                  border: '2px solid #FFD4E0',
+                }}
+              >
+                <span className="text-base">🔒</span>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  placeholder="••••••••"
+                  className="flex-1 text-sm font-semibold bg-transparent outline-none"
+                  style={{ color: '#5A4A5C' }}
+                />
+              </div>
+            </div>
+
+            {error && (
+              <p
+                className="text-xs rounded-2xl px-4 py-2 font-semibold"
+                style={{ color: '#E05C6A', background: '#FFF0F2' }}
+              >
+                {error}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 font-bold text-sm rounded-2xl text-white active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{
+                background: '#5A4A5C',
+                boxShadow: '0 8px 18px rgba(90, 74, 92, 0.28)',
+              }}
+            >
+              {loading ? '...' : mode === 'login' ? 'Ingresar ✿' : 'Crear cuenta ✿'}
+            </button>
+          </form>
+
+          <div className="flex items-center my-5 gap-3">
+            <div className="flex-1 h-px" style={{ background: '#FFD4E0' }} />
+            <span className="text-xs font-bold" style={{ color: '#8E7B92' }}>o continúa con</span>
+            <div className="flex-1 h-px" style={{ background: '#FFD4E0' }} />
+          </div>
+
+          <button
+            onClick={handleGoogle}
+            disabled={loading}
+            className="w-full py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-3 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+            style={{
+              background: '#fff',
+              boxShadow: '0 4px 14px rgba(255, 105, 180, 0.08)',
+              border: '2px solid #FFD4E0',
+              color: '#5A4A5C',
+            }}
+          >
+            <GoogleIcon />
+            Google
+          </button>
+        </div>
+
+        {/* Footer link */}
+        <div className="text-center mt-6 text-sm" style={{ color: '#8E7B92' }}>
+          {mode === 'login' ? (
+            <>
+              ¿Primera vez?{' '}
+              <button
+                onClick={() => { setMode('register'); setError(''); }}
+                className="font-bold"
+                style={{ color: '#FF69B4' }}
+              >
+                Plant tu primera flor →
+              </button>
+            </>
+          ) : (
+            <>
+              ¿Ya tienes cuenta?{' '}
+              <button
+                onClick={() => { setMode('login'); setError(''); }}
+                className="font-bold"
+                style={{ color: '#FF69B4' }}
+              >
+                Ingresar →
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
