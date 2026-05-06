@@ -1,0 +1,53 @@
+---
+type NavItem = 'home' | 'goals' | 'garden' | 'me';
+
+interface Props {
+  active?: NavItem;
+}
+
+const { active = 'home' } = Astro.props;
+
+const items: { id: NavItem; icon: string; label: string; href: string }[] = [
+  { id: 'home',   icon: '🏡', label: 'Home',   href: '/' },
+  { id: 'goals',  icon: '🎯', label: 'Goals',  href: '/goals' },
+  { id: 'garden', icon: '🌸', label: 'Garden', href: '/garden' },
+  { id: 'me',     icon: '👤', label: 'Me',     href: '/me' },
+];
+---
+
+<nav
+  class="fixed bottom-0 left-0 right-0 z-40"
+  style="
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+    padding: 14px 18px 28px;
+    box-shadow: 0 -8px 24px rgba(255,105,180,0.08);
+    border-top: 1px solid rgba(255,183,197,0.25);
+  "
+>
+  <div class="flex justify-around items-center max-w-sm mx-auto">
+    {items.map((item) => {
+      const isActive = item.id === active;
+      return (
+        <a
+          href={item.href}
+          class="flex flex-col items-center gap-1 no-underline"
+          style={isActive
+            ? 'padding: 6px 14px; background: linear-gradient(135deg, #FFD4E080, #FFB7C580); border-radius: 14px;'
+            : 'padding: 6px 10px;'
+          }
+          aria-current={isActive ? 'page' : undefined}
+        >
+          <span class="text-xl" style={isActive ? '' : 'filter: grayscale(0.3)'}>{item.icon}</span>
+          <span
+            class="text-xs font-bold"
+            style={isActive ? 'color: #FF69B4;' : 'color: #8E7B92;'}
+          >{item.label}</span>
+        </a>
+      );
+    })}
+  </div>
+</nav>
