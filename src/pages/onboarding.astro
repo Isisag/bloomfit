@@ -1,0 +1,10 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import AuthGuard from '@/components/islands/AuthGuard';
+import OnboardingFlow from '@/components/islands/OnboardingFlow';
+---
+
+<MainLayout title="BloomFit — Bienvenida">
+  <AuthGuard client:load requireAuth={true} />
+  <OnboardingFlow client:load />
+</MainLayout>

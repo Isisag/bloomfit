@@ -1,0 +1,10 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import AuthForm from '@/components/islands/AuthForm';
+import AuthGuard from '@/components/islands/AuthGuard';
+---
+
+<MainLayout title="BloomFit — Ingresar">
+  <AuthGuard client:load requireAuth={false} redirectTo="/" />
+  <AuthForm client:load />
+</MainLayout>

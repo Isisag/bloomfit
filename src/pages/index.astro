@@ -1,17 +1,21 @@
 ---
-
+import MainLayout from '@/layouts/MainLayout.astro';
+import AuthGuard from '@/components/islands/AuthGuard';
+import DashboardInit from '@/components/islands/DashboardInit';
+import LogoutButton from '@/components/islands/LogoutButton';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<MainLayout title="BloomFit">
+  <AuthGuard client:load requireAuth={true} />
+  <DashboardInit client:load />
+  <div class="min-h-screen flex items-center justify-center bg-rose-50 relative">
+    <div class="absolute top-4 right-4">
+      <LogoutButton client:load />
+    </div>
+    <div class="text-center">
+      <div class="text-5xl mb-4">🌸</div>
+      <h1 class="text-2xl font-bold text-rose-400">BloomFit</h1>
+      <p class="text-rose-300 mt-2 text-sm">Dashboard — próximamente</p>
+    </div>
+  </div>
+</MainLayout>
