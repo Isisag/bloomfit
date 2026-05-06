@@ -1,0 +1,58 @@
+---
+import { themes } from '@/lib/themes';
+import type { ThemeName } from '@/lib/themes';
+
+const themeKeys = Object.keys(themes) as ThemeName[];
+---
+
+<div
+  class="flex gap-2 items-center"
+  role="group"
+  aria-label="Seleccionar tema de color"
+>
+  {themeKeys.map((key) => (
+    <button
+      data-theme-btn={key}
+      title={themes[key].label}
+      aria-label={`Tema ${themes[key].label}`}
+      class="w-8 h-8 rounded-full border-2 border-transparent transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2"
+      style={`background-color: ${themes[key].primary}`}
+    />
+  ))}
+</div>
+
+<script>
+  import { auth, db } from '@/lib/firebase';
+  import { doc, updateDoc } from 'firebase/firestore';
+  import { THEME_STORAGE_KEY, DEFAULT_THEME } from '@/lib/themes';
+  import type { ThemeName } from '@/lib/themes';
+
+  function applyTheme(theme: ThemeName) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+
+    const user = auth.currentUser;
+    if (user) {
+      updateDoc(doc(db, 'users', user.uid), { theme }).catch(() => {});
+    }
+
+    updateActiveState(theme);
+  }
+
+  function updateActiveState(active: ThemeName) {
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-btn]').forEach((btn) => {
+      const isActive = btn.dataset.themeBtn === active;
+      btn.style.borderColor = isActive ? btn.style.backgroundColor : 'transparent';
+      btn.style.transform = isActive ? 'scale(1.15)' : '';
+    });
+  }
+
+  const current = (localStorage.getItem(THEME_STORAGE_KEY) || DEFAULT_THEME) as ThemeName;
+  updateActiveState(current);
+
+  document.querySelectorAll<HTMLButtonElement>('[data-theme-btn]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      applyTheme(btn.dataset.themeBtn as ThemeName);
+    });
+  });
+</script>

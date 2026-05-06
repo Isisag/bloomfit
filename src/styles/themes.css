@@ -1,0 +1,48 @@
+:root,
+[data-theme='sakura'] {
+  --color-primary: #FFB7C5;
+  --color-secondary: #FFE4E1;
+  --color-accent: #FF69B4;
+  --color-bg: #FFF5F7;
+  --color-bg-gradient: linear-gradient(135deg, #FFF5F7 0%, #FFE4E1 100%);
+  --color-text: #5D4E6D;
+  --color-text-muted: #9B8AA5;
+  --color-border: #FFD1DC;
+  --color-flower-tint: #FFB7C5;
+}
+
+[data-theme='lavender'] {
+  --color-primary: #D8BFD8;
+  --color-secondary: #E6E6FA;
+  --color-accent: #9370DB;
+  --color-bg: #F8F4FF;
+  --color-bg-gradient: linear-gradient(135deg, #F8F4FF 0%, #E6E6FA 100%);
+  --color-text: #4A4A6A;
+  --color-text-muted: #8A8AAA;
+  --color-border: #D8BFD8;
+  --color-flower-tint: #D8BFD8;
+}
+
+[data-theme='sky'] {
+  --color-primary: #B0E0E6;
+  --color-secondary: #E0FFFF;
+  --color-accent: #87CEEB;
+  --color-bg: #F0F8FF;
+  --color-bg-gradient: linear-gradient(135deg, #F0F8FF 0%, #E0FFFF 100%);
+  --color-text: #2F4F4F;
+  --color-text-muted: #5F9F9F;
+  --color-border: #B0E0E6;
+  --color-flower-tint: #B0E0E6;
+}
+
+[data-theme='cream'] {
+  --color-primary: #F5DEB3;
+  --color-secondary: #FFF8DC;
+  --color-accent: #DEB887;
+  --color-bg: #FFFAF0;
+  --color-bg-gradient: linear-gradient(135deg, #FFFAF0 0%, #FFF8DC 100%);
+  --color-text: #5C4033;
+  --color-text-muted: #8B7355;
+  --color-border: #F5DEB3;
+  --color-flower-tint: #F5DEB3;
+}
