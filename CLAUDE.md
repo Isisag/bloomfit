@@ -76,8 +76,8 @@ public/
 | F1 | Auth | ✅ |
 | F2 | Onboarding | ✅ |
 | F3 | Sistema de temas | ✅ |
-| F4 | Layout + navegación | ⬜ |
-| F5 | Dashboard | ⬜ |
+| F4 | Layout + navegación | ✅ |
+| F5 | Dashboard | ✅ |
 | F6 | Timer | ⬜ |
 | F7 | Registro workout | ⬜ |
 | F8 | Metas | ⬜ |
