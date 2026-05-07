@@ -3,6 +3,7 @@ import { onAuthStateChanged, auth } from '@/lib/auth';
 import { getUserProfile, getActiveGoals, getRecentWorkouts } from '@/lib/firestore';
 import type { UserProfile, Goal, Workout } from '@/lib/firestore';
 import KawaiiFlower from './KawaiiFlower';
+import { BloomIcon, IconBadge } from './BloomIcons';
 
 // Theme-specific dashboard colors matching Claude Design THEMES object
 const DASH_THEMES = {
@@ -12,9 +13,9 @@ const DASH_THEMES = {
   cream:    { bgTop: '#FFF8E8', bg: '#FFFAF0', soft: '#FFE9C4', mid: '#FFE5B5', deep: '#D9A24A', flowerPetal: '#FFE5B5', flowerDeep: '#E5C690', flowerCenter: '#FFB7C5', motivA: '#FFB7C5', motivB: '#FFE5B5' },
 };
 
-const WORKOUT_ICONS: Record<string, string> = {
-  strength: '💪', cardio: '🏃‍♀️', yoga: '🧘‍♀️',
-  stretching: '🤸‍♀️', hiit: '🔥', walking: '🚶‍♀️', other: '✨',
+const WORKOUT_ICON_NAMES: Record<string, string> = {
+  strength: 'strength', cardio: 'cardio', yoga: 'yoga',
+  stretching: 'stretch', hiit: 'hiit', walking: 'walk', other: 'sparkle',
 };
 
 const MOTIVATION = [
@@ -47,7 +48,7 @@ function ProgressRing({ pct, size = 60, deep }: { pct: number; size?: number; de
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
         style={{ transition: 'stroke-dashoffset 0.6s ease' }}
       />
-      <text x="50%" y="54%" textAnchor="middle" fontSize="13" fontWeight="800" fill="#5A4A5C" fontFamily="Quicksand, Nunito, sans-serif">
+      <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" fontSize="13" fontWeight="800" fill="#5A4A5C" fontFamily="Quicksand, Nunito, sans-serif">
         {Math.round(clamped)}%
       </text>
     </svg>
@@ -55,7 +56,7 @@ function ProgressRing({ pct, size = 60, deep }: { pct: number; size?: number; de
 }
 
 function WorkoutRow({ workout, bg, deep }: { workout: Workout; bg: string; deep: string }) {
-  const icon = WORKOUT_ICONS[workout.type] ?? '✨';
+  const iconName = WORKOUT_ICON_NAMES[workout.type] ?? 'sparkle';
   const date = workout.date?.toDate?.() ?? new Date();
   const isToday = new Date().toDateString() === date.toDateString();
   const timeLabel = isToday
@@ -67,12 +68,7 @@ function WorkoutRow({ workout, bg, deep }: { workout: Workout; bg: string; deep:
       className="flex items-center gap-3 rounded-2xl px-4 py-3"
       style={{ background: '#fff', boxShadow: '0 4px 14px rgba(255,105,180,0.08)' }}
     >
-      <div
-        className="flex items-center justify-center text-xl rounded-2xl"
-        style={{ width: 38, height: 38, background: `${bg}80`, borderRadius: 12, flexShrink: 0 }}
-      >
-        {icon}
-      </div>
+      <IconBadge name={iconName} size={38} bg={`${bg}80`} radius={12} />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-bold truncate capitalize" style={{ color: '#5A4A5C' }}>
           {workout.type}
@@ -142,9 +138,10 @@ export default function DashboardContent() {
 
   return (
     <div
-      className="min-h-screen flex flex-col max-w-sm mx-auto"
+      className="min-h-screen"
       style={{ background: `linear-gradient(180deg, ${T.bgTop} 0%, ${T.bg} 30%, ${T.bg} 100%)` }}
     >
+    <div className="min-h-screen flex flex-col max-w-sm mx-auto">
       {/* Header */}
       <div className="flex items-start justify-between px-6 pt-12 pb-2">
         <div>
@@ -155,11 +152,11 @@ export default function DashboardContent() {
           </h1>
         </div>
         <button
-          className="relative flex items-center justify-center rounded-2xl text-lg"
+          className="relative flex items-center justify-center rounded-2xl"
           style={{ width: 40, height: 40, background: '#fff', boxShadow: '0 4px 14px rgba(255,105,180,0.1)' }}
           aria-label="Notificaciones"
         >
-          🔔
+          <BloomIcon name="bell" size={22} />
         </button>
       </div>
 
@@ -172,12 +169,7 @@ export default function DashboardContent() {
         }}
       >
         <div style={{ position: 'absolute', right: -16, top: -16, fontSize: 72, opacity: 0.2 }}>✨</div>
-        <div
-          className="flex items-center justify-center text-xl rounded-2xl flex-shrink-0"
-          style={{ width: 44, height: 44, background: 'rgba(255,255,255,0.4)', borderRadius: 14 }}
-        >
-          🌷
-        </div>
+        <IconBadge name="petal" size={44} bg="rgba(255,255,255,0.4)" radius={14} />
         <div style={{ position: 'relative' }}>
           <div className="text-xs font-bold" style={{ color: 'rgba(255,255,255,0.9)', letterSpacing: '0.3px' }}>
             DAILY BLOOM
@@ -244,15 +236,17 @@ export default function DashboardContent() {
           className="flex-1 flex items-center justify-center gap-2 font-bold text-sm text-white rounded-2xl py-4"
           style={{ background: '#5A4A5C', boxShadow: '0 8px 18px rgba(90,74,92,0.28)', textDecoration: 'none' }}
         >
-          ✿ Entrenar
+          <BloomIcon name="timer" size={18} />
+          Timer
         </a>
-        <button
-          className="flex items-center justify-center text-xl rounded-2xl"
-          style={{ width: 56, height: 56, background: '#fff', boxShadow: '0 4px 14px rgba(255,105,180,0.1)', borderRadius: 18 }}
-          aria-label="Registrar entrenamiento"
+        <a
+          href="/workout/register"
+          className="flex-1 flex items-center justify-center gap-2 font-bold text-sm rounded-2xl py-4"
+          style={{ background: '#fff', boxShadow: '0 4px 14px rgba(255,105,180,0.1)', color: '#5A4A5C', textDecoration: 'none' }}
         >
-          📊
-        </button>
+          <BloomIcon name="plus" size={18} />
+          Agregar
+        </a>
       </div>
 
       {/* Recent workouts */}
@@ -281,6 +275,7 @@ export default function DashboardContent() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }
