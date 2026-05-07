@@ -7,7 +7,6 @@ interface Props {
 
 const { active = 'home' } = Astro.props;
 
-// Palette (matches icons.jsx)
 const stroke = '#4A3D4D';
 const pinkMid = '#FFB7C5';
 const lavMid = '#D5BDF5';
@@ -20,7 +19,7 @@ const white = '#FFFFFF';
 const items: { id: NavItem; label: string; href: string }[] = [
   { id: 'home',   label: 'Home',   href: '/' },
   { id: 'train',  label: 'Train',  href: '/workout/register' },
-  { id: 'garden', label: 'Garden', href: '/garden' },
+  { id: 'garden', label: 'Garden', href: '/goals' },
   { id: 'me',     label: 'Me',     href: '/me' },
 ];
 ---
@@ -44,14 +43,16 @@ const items: { id: NavItem; label: string; href: string }[] = [
       return (
         <a
           href={item.href}
-          class="flex flex-col items-center gap-1 no-underline"
+          data-nav-id={item.id}
+          data-astro-prefetch
+          class="flex flex-col items-center gap-1 no-underline bloom-nav-link"
           style={isActive
             ? 'padding: 6px 14px; background: linear-gradient(135deg, #FFD4E080, #FFB7C580); border-radius: 14px;'
             : 'padding: 6px 10px;'
           }
           aria-current={isActive ? 'page' : undefined}
         >
-          <span style={isActive ? 'display:flex' : 'display:flex; opacity:0.55'}>
+          <span class="bloom-nav-icon" style={isActive ? 'display:flex' : 'display:flex; opacity:0.55'}>
             {item.id === 'home' && (
               <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M4 11 L12 4 L20 11 V20 H4 Z" fill={peachSoft} stroke={stroke} stroke-width="1.4" stroke-linejoin="round"/>
@@ -86,7 +87,7 @@ const items: { id: NavItem; label: string; href: string }[] = [
             )}
           </span>
           <span
-            class="text-xs font-bold"
+            class="bloom-nav-label text-xs font-bold"
             style={isActive ? 'color: #FF8FAB;' : 'color: #8E7B92;'}
           >{item.label}</span>
         </a>
@@ -94,3 +95,46 @@ const items: { id: NavItem; label: string; href: string }[] = [
     })}
   </div>
 </nav>
+
+<script is:inline>
+  function applyNavActive() {
+    const path = window.location.pathname;
+    const links = document.querySelectorAll('.bloom-nav-link');
+
+    function getActiveId(p) {
+      if (p === '/') return 'home';
+      if (p.startsWith('/workout')) return 'train';
+      if (p.startsWith('/goals')) return 'garden';
+      if (p.startsWith('/me')) return 'me';
+      return null;
+    }
+
+    const activeId = getActiveId(path);
+
+    links.forEach(function(link) {
+      const id = link.getAttribute('data-nav-id');
+      const isActive = id === activeId;
+      const icon = link.querySelector('.bloom-nav-icon');
+      const label = link.querySelector('.bloom-nav-label');
+
+      if (isActive) {
+        link.style.padding = '6px 14px';
+        link.style.background = 'linear-gradient(135deg, #FFD4E080, #FFB7C580)';
+        link.style.borderRadius = '14px';
+        link.setAttribute('aria-current', 'page');
+        if (icon) icon.style.opacity = '1';
+        if (label) label.style.color = '#FF8FAB';
+      } else {
+        link.style.padding = '6px 10px';
+        link.style.background = 'transparent';
+        link.style.borderRadius = '0';
+        link.removeAttribute('aria-current');
+        if (icon) icon.style.opacity = '0.55';
+        if (label) label.style.color = '#8E7B92';
+      }
+    });
+  }
+
+  applyNavActive();
+  document.addEventListener('astro:page-load', applyNavActive);
+</script>

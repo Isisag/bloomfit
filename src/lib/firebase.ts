@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { initializeFirestore, persistentLocalCache } from 'firebase/firestore';
+import { initializeFirestore, getFirestore, persistentLocalCache } from 'firebase/firestore';
 
 const required = [
   'PUBLIC_FIREBASE_API_KEY',
@@ -27,11 +27,12 @@ const firebaseConfig = {
   appId: import.meta.env.PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const isNewApp = getApps().length === 0;
+const app = isNewApp ? initializeApp(firebaseConfig) : getApps()[0];
 
 export const auth = getAuth(app);
 
-// persistentLocalCache replaces the deprecated enableIndexedDbPersistence (Firebase 9+)
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache()
-});
+// initializeFirestore only on first load — getFirestore on HMR re-execution
+export const db = isNewApp
+  ? initializeFirestore(app, { localCache: persistentLocalCache() })
+  : getFirestore(app);
