@@ -1,0 +1,10 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import AuthGuard from '@/components/islands/AuthGuard';
+import WorkoutTimer from '@/components/islands/WorkoutTimer';
+---
+
+<AppLayout title="BloomFit — Entrenar" activeNav="home">
+  <AuthGuard client:load requireAuth={true} />
+  <WorkoutTimer client:load />
+</AppLayout>
