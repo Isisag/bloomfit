@@ -192,11 +192,10 @@ export default function WorkoutTimer() {
   const [elapsed, setElapsed] = useState(0);
   const [wakeLockUnavailable, setWakeLockUnavailable] = useState(false);
 
-  const workerRef   = useRef<Worker | null>(null);
-  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
-  const stateRef    = useRef<TimerState>('ready');
-
-  stateRef.current = timerState;
+  const workerRef    = useRef<Worker | null>(null);
+  const wakeLockRef  = useRef<WakeLockSentinel | null>(null);
+  const stateRef     = useRef<TimerState>('ready');
+  const targetMsRef  = useRef(0);
 
   const activeMode  = MODES.find((m) => m.id === modeId) ?? MODES[0];
   const targetMs    = modeId === 'free' ? customMs : activeMode.targetMs;
@@ -207,6 +206,10 @@ export default function WorkoutTimer() {
   const isPaused    = timerState === 'paused';
   const isCompleted = timerState === 'completed';
 
+  // Keep refs in sync after each commit (never during render)
+  useEffect(() => { stateRef.current = timerState; });
+  useEffect(() => { targetMsRef.current = targetMs; });
+
   // ── Worker ─────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (workerRef.current) return;
@@ -215,7 +218,14 @@ export default function WorkoutTimer() {
       { type: 'module' },
     );
     w.addEventListener('message', (e: MessageEvent<{ elapsed: number }>) => {
-      setElapsed(e.data.elapsed);
+      const { elapsed } = e.data;
+      setElapsed(elapsed);
+      const tMs = targetMsRef.current;
+      if (tMs > 0 && stateRef.current === 'running' && elapsed >= tMs) {
+        w.postMessage({ type: 'stop' });
+        wakeLockRef.current?.release();
+        setTimerState('completed');
+      }
     });
     workerRef.current = w;
     return () => {
@@ -224,15 +234,6 @@ export default function WorkoutTimer() {
       workerRef.current = null;
     };
   }, []);
-
-  // Auto-complete countdown
-  useEffect(() => {
-    if (isCountdown && isRunning && elapsed >= targetMs) {
-      workerRef.current?.postMessage({ type: 'stop' });
-      releaseWakeLock();
-      setTimerState('completed');
-    }
-  }, [elapsed, isRunning, isCountdown, targetMs]);
 
   // ── Wake Lock ──────────────────────────────────────────────────────────────
   async function requestWakeLock() {
