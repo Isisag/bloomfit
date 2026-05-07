@@ -1,6 +1,7 @@
 import {
   doc, getDoc, collection, query,
   where, orderBy, limit, getDocs,
+  addDoc, updateDoc, increment,
 } from 'firebase/firestore';
 import type { Timestamp } from 'firebase/firestore';
 import { db } from './firebase';
@@ -59,4 +60,24 @@ export async function getRecentWorkouts(uid: string, count = 5): Promise<Workout
   );
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ workoutId: d.id, ...d.data() } as Workout));
+}
+
+export async function saveWorkout(
+  uid: string,
+  data: { type: string; duration: number; date: Timestamp; mood?: string },
+): Promise<string> {
+  const ref = await addDoc(collection(db, 'users', uid, 'workouts'), data);
+  return ref.id;
+}
+
+export async function updateGoalProgress(uid: string, minutes: number): Promise<void> {
+  const goals = await getActiveGoals(uid);
+  await Promise.all(
+    goals.map((goal) => {
+      const delta = goal.metric === 'count' ? 1 : minutes;
+      return updateDoc(doc(db, 'users', uid, 'goals', goal.goalId), {
+        current: increment(delta),
+      });
+    }),
+  );
 }
