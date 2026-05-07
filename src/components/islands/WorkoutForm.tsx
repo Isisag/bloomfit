@@ -195,17 +195,16 @@ export default function WorkoutForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  // Read duration from URL query param (passed from timer)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const d = parseInt(params.get('duration') ?? '', 10);
-    if (!isNaN(d) && d > 0) setDuration(d);
-  }, []);
-
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) setUid(user.uid);
-      else window.location.href = '/login';
+      if (user) {
+        setUid(user.uid);
+        const params = new URLSearchParams(window.location.search);
+        const d = parseInt(params.get('duration') ?? '', 10);
+        if (!isNaN(d) && d > 0) setDuration(d);
+      } else {
+        window.location.href = '/login';
+      }
     });
     return unsub;
   }, []);
