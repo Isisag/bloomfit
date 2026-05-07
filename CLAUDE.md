@@ -68,6 +68,47 @@ public/
   sounds/        ← efectos de audio (<50KB)
 ```
 
+## Patrones de UI — reglas obligatorias
+
+Antes de implementar cualquier componente de interacción, revisar estas reglas. Son contratos del sistema de diseño.
+
+### Navegación / volver atrás
+- **Siempre** usar `<BloomIcon name="back" size={40} />` dentro de un `<a>` blanco (40×40, borderRadius:14, boxShadow: shadowSoft).
+- **Nunca** usar X, close, ✕ ni `IconClose` para navegación de página — esos íconos son solo para cerrar modals/dialogs dentro de una pantalla.
+- Patrón estándar de header:
+  ```tsx
+  <div style={{ padding:'52px 24px 0', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+    <a href="/" style={{ display:'flex', textDecoration:'none' }}>
+      <BloomIcon name="back" size={40} />
+    </a>
+    <div style={{ fontSize:14, fontWeight:800, color:'#5A4A5C' }}>Título</div>
+    <div style={{ width:40 }} />  {/* spacer o acción secundaria */}
+  </div>
+  ```
+
+### Íconos
+- **Fuente única**: `BloomIcon` y `IconBadge` de `@/components/islands/BloomIcons.tsx`.
+- **No definir SVGs inline** en nuevos componentes — agregar el ícono a `BloomIcons.tsx` si falta.
+- Para badges con fondo: `<IconBadge name="yoga" size={42} bg={color} radius={12} />`
+
+### Layouts de tarjeta con múltiples elementos
+- Si una fila tiene badge + contenido + chips/extras, separar en **dos filas** dentro del card para evitar overflow en pantallas pequeñas.
+- Ejemplo correcto (Duration card):
+  ```
+  Fila 1: [badge 42px] [label + stepper]
+  Fila 2: [chips flexWrap]
+  ```
+- **No usar** `flexShrink:0` en grupos de chips que compiten con contenido dinámico.
+
+### Botones primarios
+- CTA principal: `background: '#5A4A5C'` (ink), texto blanco, `borderRadius:22`, `boxShadow: shadowDark`.
+- CTA secundario: `background: '#fff'`, texto ink/inkSoft, mismo border radius, `boxShadow: shadowSoft`.
+- Nunca gradiente rosa en CTAs — solo en cards decorativas.
+
+### Paleta de íconos disponibles
+Ver `src/components/islands/BloomIcons.tsx` para la lista completa. Nombres clave:
+`home`, `cardio`, `flower`, `user`, `bell`, `chart`, `timer`, `drop`, `check`, `close`, `back`, `plus`, `mail`, `lock`, `petal`, `sparkle`, `flame`, `yoga`, `strength`, `stretch`, `hiit`, `walk`, `faceSleep`, `faceCalm`, `faceHappy`, `faceStar`, `faceLove`
+
 ## Features y estado
 
 | # | Feature | Estado |
@@ -78,8 +119,8 @@ public/
 | F3 | Sistema de temas | ✅ |
 | F4 | Layout + navegación | ✅ |
 | F5 | Dashboard | ✅ |
-| F6 | Timer | ⬜ |
-| F7 | Registro workout | ⬜ |
+| F6 | Timer | ✅ |
+| F7 | Registro workout | ✅ |
 | F8 | Metas | ⬜ |
 | F9 | Flor evolutiva SVG | ⬜ |
 | F10 | Desbloqueables | ⬜ |
