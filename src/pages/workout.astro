@@ -6,5 +6,5 @@ import WorkoutTimer from '@/components/islands/WorkoutTimer';
 
 <AppLayout title="BloomFit — Entrenar" activeNav="home">
   <AuthGuard client:load requireAuth={true} />
-  <WorkoutTimer client:load />
+  <WorkoutTimer client:only="react" />
 </AppLayout>

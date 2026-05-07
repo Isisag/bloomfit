@@ -2,8 +2,8 @@ import {
   doc, getDoc, collection, query,
   where, orderBy, limit, getDocs,
   addDoc, updateDoc, increment,
+  Timestamp, serverTimestamp,
 } from 'firebase/firestore';
-import type { Timestamp } from 'firebase/firestore';
 import { db } from './firebase';
 import type { ThemeName } from './themes';
 
@@ -28,6 +28,8 @@ export interface Goal {
   target: number;
   current: number;
   isActive: boolean;
+  createdAt?: Timestamp;
+  lastReset?: Timestamp;
 }
 
 export interface Workout {
@@ -80,4 +82,51 @@ export async function updateGoalProgress(uid: string, minutes: number): Promise<
       });
     }),
   );
+}
+
+export async function checkAndResetGoals(uid: string): Promise<void> {
+  const goals = await getActiveGoals(uid);
+  const now = new Date();
+
+  const weekStart = new Date(now);
+  weekStart.setHours(0, 0, 0, 0);
+  const dow = weekStart.getDay();
+  weekStart.setDate(weekStart.getDate() - (dow === 0 ? 6 : dow - 1));
+
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+
+  await Promise.all(
+    goals.map((goal) => {
+      const resetBoundary = goal.type === 'weekly' ? weekStart : monthStart;
+      const lastReset = goal.lastReset?.toDate() ?? goal.createdAt?.toDate() ?? new Date(0);
+      if (lastReset < resetBoundary && goal.current > 0) {
+        return updateDoc(doc(db, 'users', uid, 'goals', goal.goalId), {
+          current: 0,
+          lastReset: Timestamp.fromDate(resetBoundary),
+        });
+      }
+      return Promise.resolve();
+    }),
+  );
+}
+
+export async function createGoal(
+  uid: string,
+  data: { type: 'weekly' | 'monthly'; metric: 'count' | 'minutes'; target: number },
+): Promise<void> {
+  const existing = await getActiveGoals(uid);
+  if (existing.some((g) => g.type === data.type)) {
+    throw new Error(`Ya tenés una meta ${data.type === 'weekly' ? 'semanal' : 'mensual'} activa.`);
+  }
+  await addDoc(collection(db, 'users', uid, 'goals'), {
+    ...data,
+    current: 0,
+    isActive: true,
+    createdAt: serverTimestamp(),
+    lastReset: serverTimestamp(),
+  });
+}
+
+export async function deactivateGoal(uid: string, goalId: string): Promise<void> {
+  await updateDoc(doc(db, 'users', uid, 'goals', goalId), { isActive: false });
 }

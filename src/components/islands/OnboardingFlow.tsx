@@ -63,7 +63,9 @@ export default function OnboardingFlow() {
         metric: goalMetric,
         target: goalTarget,
         current: 0,
+        isActive: true,
         createdAt: serverTimestamp(),
+        lastReset: serverTimestamp(),
       });
       window.location.href = '/';
     } catch {

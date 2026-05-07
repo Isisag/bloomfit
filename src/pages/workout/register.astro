@@ -4,7 +4,7 @@ import AuthGuard from '@/components/islands/AuthGuard';
 import WorkoutForm from '@/components/islands/WorkoutForm';
 ---
 
-<AppLayout title="BloomFit — Registrar entrenamiento" activeNav="home">
+<AppLayout title="BloomFit — Registrar entrenamiento" activeNav="train">
   <AuthGuard client:load requireAuth={true} />
   <WorkoutForm client:load />
 </AppLayout>

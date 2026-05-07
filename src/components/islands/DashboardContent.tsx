@@ -214,7 +214,12 @@ export default function DashboardContent() {
       >
         <ProgressRing pct={pct} size={60} deep={T.deep} />
         <div className="flex-1">
-          <div className="text-xs font-bold tracking-wide" style={{ color: '#8E7B92' }}>ESTA SEMANA</div>
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-bold tracking-wide" style={{ color: '#8E7B92' }}>ESTA SEMANA</div>
+            <a href="/goals" className="text-xs font-bold" style={{ color: T.deep, textDecoration: 'none' }}>
+              Ver metas →
+            </a>
+          </div>
           <div className="text-base font-bold mt-1" style={{ color: '#5A4A5C' }}>{goalLabel}</div>
           <div className="mt-2 h-2 rounded-full overflow-hidden" style={{ background: T.soft }}>
             <div
