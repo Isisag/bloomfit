@@ -3,7 +3,6 @@ import { onAuthStateChanged, auth } from '@/lib/auth';
 import { saveWorkout, updateGoalProgress } from '@/lib/firestore';
 import { Timestamp } from 'firebase/firestore';
 import KawaiiFlower from './KawaiiFlower';
-import { BloomIcon } from './BloomIcons';
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const C2 = {
@@ -232,7 +231,10 @@ export default function WorkoutForm() {
         {/* Header */}
         <div style={{ padding: '52px 24px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <a href="/" aria-label="Volver" style={{ display: 'flex', textDecoration: 'none' }}>
-            <BloomIcon name="back" size={40} />
+            <svg width={40} height={40} viewBox="0 0 40 40" fill="none">
+              <circle cx={20} cy={20} r={20} fill={C2.lavenderSoft} />
+              <path d="M23 13l-7 7 7 7" stroke={C2.ink} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </a>
           <div style={{ fontSize: 14, fontWeight: 800, color: C2.ink }}>Log workout</div>
           <div style={{ width: 40 }} />
