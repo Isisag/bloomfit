@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged, auth } from '@/lib/auth';
-import { getUserProfile, getActiveGoals, getRecentWorkouts } from '@/lib/firestore';
+import {
+  getUserProfile, getActiveGoals, getRecentWorkouts,
+  checkAndResetGoals, clearPendingUnlocks,
+} from '@/lib/firestore';
 import type { UserProfile, Goal, Workout } from '@/lib/firestore';
-import KawaiiFlower from './KawaiiFlower';
+import { FLOWER_PARTS, resolvePetalSwatch } from '@/lib/flower-parts';
+import type { FlowerPart } from '@/lib/flower-parts';
+import { getMotivationalMessage, detectDashboardContext } from '@/lib/messages';
+import FlowerAvatar from './FlowerAvatar';
+import UnlockModal from './UnlockModal';
 import { BloomIcon, IconBadge } from './BloomIcons';
 
 // Theme-specific dashboard colors matching Claude Design THEMES object
@@ -17,14 +24,6 @@ const WORKOUT_ICON_NAMES: Record<string, string> = {
   strength: 'strength', cardio: 'cardio', yoga: 'yoga',
   stretching: 'stretch', hiit: 'hiit', walking: 'walk', other: 'sparkle',
 };
-
-const MOTIVATION = [
-  '¡Tu flor te está esperando! 🌱',
-  'Cada entrenamiento la hace crecer ✨',
-  'Pequeños pasos, grandes blooms 🌸',
-  'Tú puedes, tu flor lo sabe 💪',
-  'Hoy es un buen día para florecer 🌷',
-];
 
 function todayLabel(): string {
   return new Intl.DateTimeFormat('es', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -101,11 +100,13 @@ export default function DashboardContent() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pendingParts, setPendingParts] = useState<FlowerPart[]>([]);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) return;
       try {
+        await checkAndResetGoals(user.uid);
         const [p, g, w] = await Promise.all([
           getUserProfile(user.uid),
           getActiveGoals(user.uid),
@@ -114,12 +115,21 @@ export default function DashboardContent() {
         setProfile(p);
         setGoals(g);
         setWorkouts(w);
+        if (p?.pendingUnlocks?.length) {
+          const parts = FLOWER_PARTS.filter((fp) => p.pendingUnlocks!.includes(fp.id));
+          setPendingParts(parts);
+        }
       } finally {
         setLoading(false);
       }
     });
     return unsub;
   }, []);
+
+  async function handleDismissUnlock() {
+    if (profile?.uid) await clearPendingUnlocks(profile.uid);
+    setPendingParts([]);
+  }
 
   if (loading) return <Skeleton />;
 
@@ -133,10 +143,23 @@ export default function DashboardContent() {
     ? `${primaryGoal.current} de ${primaryGoal.target} ${primaryGoal.metric === 'count' ? 'sesiones' : 'minutos'}`
     : 'Sin meta activa';
 
-  const motivation = MOTIVATION[new Date().getDay() % MOTIVATION.length];
   const displayName = profile?.displayName || 'amiga';
+  const savedJustNow = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('saved') === '1';
+  const msgContext = detectDashboardContext(pct, profile?.weeklyStreak ?? 0, workouts, savedJustNow);
+  const motivation = getMotivationalMessage(msgContext, { name: displayName, count: profile?.weeklyStreak ?? 0 });
+
+  // Resolve flower colors: prefer flowerConfig swatches, fall back to theme colors
+  const petalSwatch = profile?.flowerConfig?.petals
+    ? resolvePetalSwatch(profile.flowerConfig.petals)
+    : null;
+  const flowerPetalColor = petalSwatch?.color ?? T.flowerPetal;
+  const flowerPetalDeep = petalSwatch?.deep ?? T.flowerDeep;
 
   return (
+    <>
+      {pendingParts.length > 0 && (
+        <UnlockModal parts={pendingParts} onDismiss={handleDismissUnlock} />
+      )}
     <div
       className="min-h-screen"
       style={{ background: `linear-gradient(180deg, ${T.bgTop} 0%, ${T.bg} 30%, ${T.bg} 100%)` }}
@@ -185,11 +208,11 @@ export default function DashboardContent() {
         className="flex justify-center mt-2 relative"
         style={{ filter: `drop-shadow(0 14px 24px ${T.deep}33)` }}
       >
-        <KawaiiFlower
+        <FlowerAvatar
+          pct={pct}
           size={180}
-          faceVariant="happy"
-          petalColor={T.flowerPetal}
-          petalDeep={T.flowerDeep}
+          petalColor={flowerPetalColor}
+          petalDeep={flowerPetalDeep}
           centerColor={T.flowerCenter}
         />
         {pct > 0 && (
@@ -282,5 +305,6 @@ export default function DashboardContent() {
       </div>
     </div>
     </div>
+    </>
   );
 }

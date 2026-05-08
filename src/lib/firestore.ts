@@ -6,6 +6,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { ThemeName } from './themes';
+import { getPartsForStreak } from './flower-parts';
 
 export interface UserProfile {
   uid: string;
@@ -19,6 +20,9 @@ export interface UserProfile {
     face: string;
     accessories: string[];
   };
+  weeklyStreak?: number;
+  unlockedParts?: string[];
+  pendingUnlocks?: string[];
 }
 
 export interface Goal {
@@ -84,6 +88,20 @@ export async function updateGoalProgress(uid: string, minutes: number): Promise<
   );
 }
 
+async function handleWeeklyGoalComplete(uid: string): Promise<void> {
+  const profile = await getUserProfile(uid);
+  const currentStreak = (profile?.weeklyStreak ?? 0) + 1;
+  const alreadyUnlocked = profile?.unlockedParts ?? [];
+  const newParts = getPartsForStreak(currentStreak, alreadyUnlocked);
+
+  const update: Record<string, unknown> = { weeklyStreak: currentStreak };
+  if (newParts.length > 0) {
+    update.unlockedParts = [...alreadyUnlocked, ...newParts.map((p) => p.id)];
+    update.pendingUnlocks = newParts.map((p) => p.id);
+  }
+  await updateDoc(doc(db, 'users', uid), update);
+}
+
 export async function checkAndResetGoals(uid: string): Promise<void> {
   const goals = await getActiveGoals(uid);
   const now = new Date();
@@ -95,19 +113,30 @@ export async function checkAndResetGoals(uid: string): Promise<void> {
 
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
 
-  await Promise.all(
-    goals.map((goal) => {
-      const resetBoundary = goal.type === 'weekly' ? weekStart : monthStart;
-      const lastReset = goal.lastReset?.toDate() ?? goal.createdAt?.toDate() ?? new Date(0);
-      if (lastReset < resetBoundary && goal.current > 0) {
-        return updateDoc(doc(db, 'users', uid, 'goals', goal.goalId), {
+  for (const goal of goals) {
+    const resetBoundary = goal.type === 'weekly' ? weekStart : monthStart;
+    const lastReset = goal.lastReset?.toDate() ?? goal.createdAt?.toDate() ?? new Date(0);
+
+    if (lastReset < resetBoundary) {
+      if (goal.type === 'weekly') {
+        if (goal.current >= goal.target) {
+          await handleWeeklyGoalComplete(uid);
+        } else {
+          await updateDoc(doc(db, 'users', uid), { weeklyStreak: 0 });
+        }
+      }
+      if (goal.current > 0) {
+        await updateDoc(doc(db, 'users', uid, 'goals', goal.goalId), {
           current: 0,
           lastReset: Timestamp.fromDate(resetBoundary),
         });
       }
-      return Promise.resolve();
-    }),
-  );
+    }
+  }
+}
+
+export async function clearPendingUnlocks(uid: string): Promise<void> {
+  await updateDoc(doc(db, 'users', uid), { pendingUnlocks: [] });
 }
 
 export async function createGoal(
@@ -133,4 +162,15 @@ export async function deactivateGoal(uid: string, goalId: string): Promise<void>
 
 export async function updateGoal(uid: string, goalId: string, target: number): Promise<void> {
   await updateDoc(doc(db, 'users', uid, 'goals', goalId), { target });
+}
+
+export async function updateFlowerConfig(
+  uid: string,
+  config: Partial<UserProfile['flowerConfig']>,
+): Promise<void> {
+  const updates: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(config)) {
+    updates[`flowerConfig.${key}`] = val;
+  }
+  await updateDoc(doc(db, 'users', uid), updates);
 }

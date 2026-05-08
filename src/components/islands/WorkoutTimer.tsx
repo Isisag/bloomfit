@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import KawaiiFlower from './KawaiiFlower';
+import { getMotivationalMessage } from '@/lib/messages';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 type TimerState = 'ready' | 'running' | 'paused' | 'completed';
@@ -315,6 +316,10 @@ export default function WorkoutTimer() {
   }
   const displayMs = isCountdown ? Math.max(0, targetMs - elapsed) : elapsed;
 
+  // Stable messages — computed once per mount, not on every re-render
+  const preMsg = useMemo(() => getMotivationalMessage('pre_workout'), []);
+  const doneMsg = useMemo(() => getMotivationalMessage('post_workout'), []);
+
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div style={{ minHeight: '100vh', background: `linear-gradient(180deg, ${C2.bgTop} 0%, ${C2.bg} 60%)` }}>
@@ -467,7 +472,7 @@ export default function WorkoutTimer() {
                   : `${activeMode.label} · ${formatTime(targetMs)}`}
               </div>
               <div style={{ fontSize: 13, color: C2.inkSoft, marginTop: 4 }}>
-                Tu flor crece con cada sesión 🌸
+                {preMsg}
               </div>
             </>
           )}
@@ -497,7 +502,7 @@ export default function WorkoutTimer() {
                 ¡Sesión completada!
               </div>
               <div style={{ fontSize: 13, color: C2.inkSoft, marginTop: 4 }}>
-                Guarda tu progreso para que la flor crezca.
+                {doneMsg}
               </div>
             </>
           )}
