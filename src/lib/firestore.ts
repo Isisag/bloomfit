@@ -130,3 +130,7 @@ export async function createGoal(
 export async function deactivateGoal(uid: string, goalId: string): Promise<void> {
   await updateDoc(doc(db, 'users', uid, 'goals', goalId), { isActive: false });
 }
+
+export async function updateGoal(uid: string, goalId: string, target: number): Promise<void> {
+  await updateDoc(doc(db, 'users', uid, 'goals', goalId), { target });
+}
