@@ -19,7 +19,7 @@ const white = '#FFFFFF';
 const items: { id: NavItem; label: string; href: string }[] = [
   { id: 'home',   label: 'Home',   href: '/' },
   { id: 'train',  label: 'Train',  href: '/workout/register' },
-  { id: 'garden', label: 'Garden', href: '/goals' },
+  { id: 'garden', label: 'Garden', href: '/garden' },
   { id: 'me',     label: 'Me',     href: '/me' },
 ];
 ---
@@ -104,7 +104,7 @@ const items: { id: NavItem; label: string; href: string }[] = [
     function getActiveId(p) {
       if (p === '/') return 'home';
       if (p.startsWith('/workout')) return 'train';
-      if (p.startsWith('/goals')) return 'garden';
+      if (p.startsWith('/garden')) return 'garden';
       if (p.startsWith('/me')) return 'me';
       return null;
     }
