@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { onAuthStateChanged, auth } from '@/lib/auth';
 import {
-  getActiveGoals, createGoal, deactivateGoal, checkAndResetGoals,
+  getActiveGoals, createGoal, deactivateGoal, checkAndResetGoals, updateGoal,
 } from '@/lib/firestore';
 import type { Goal } from '@/lib/firestore';
 import { BloomIcon } from './BloomIcons';
@@ -27,7 +27,7 @@ const GOAL_COLORS = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function pct(goal: Goal) {
-  return goal.target > 0 ? Math.min(Math.round((goal.current / goal.target) * 100), 100) : 0;
+  return goal.target > 0 ? Math.round((goal.current / goal.target) * 100) : 0;
 }
 
 function unitLabel(metric: 'count' | 'minutes', n: number) {
@@ -42,14 +42,17 @@ function periodLabel(type: 'weekly' | 'monthly') {
 
 // ─── GoalCard ─────────────────────────────────────────────────────────────────
 function GoalCard({
-  goal, onDelete, deleting,
+  goal, onDelete, onEdit, deleting,
 }: {
   goal: Goal;
   onDelete: (id: string) => void;
+  onEdit: (goal: Goal) => void;
   deleting: boolean;
 }) {
   const { accent, iconBg } = GOAL_COLORS[goal.type];
-  const p = pct(goal);
+  const rawPct = pct(goal);
+  const barPct = Math.min(rawPct, 100);
+  const isOverflow = rawPct > 100;
   const iconName = goal.metric === 'count' ? 'cardio' : 'timer';
 
   return (
@@ -86,10 +89,12 @@ function GoalCard({
           aria-label="Eliminar meta"
           style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            color: C2.inkSoft, fontSize: 18, lineHeight: 1, padding: '2px 4px',
-            opacity: deleting ? 0.4 : 1,
+            color: C2.inkSoft, lineHeight: 1, padding: '4px',
+            opacity: deleting ? 0.4 : 1, display: 'flex',
           }}
-        >×</button>
+        >
+          <BloomIcon name="close" size={18} />
+        </button>
       </div>
 
       {/* Row 2 — progress */}
@@ -99,15 +104,40 @@ function GoalCard({
             <span style={{ color: C2.ink, fontWeight: 800 }}>{goal.current}</span>
             {' / '}{goal.target} {goal.metric === 'count' ? 'sesiones' : 'min'}
           </span>
-          <span style={{ fontSize: 12, fontWeight: 800, color: accent }}>{p}%</span>
+          <span style={{ fontSize: 12, fontWeight: 800, color: accent }}>{rawPct}%</span>
         </div>
-        <div style={{ height: 7, background: '#FFF0F4', borderRadius: 4, overflow: 'hidden' }}>
+        <motion.div
+          role="progressbar"
+          aria-valuenow={barPct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${rawPct}% completado`}
+          style={{ height: 7, background: '#FFF0F4', borderRadius: 4, overflow: 'hidden' }}
+          animate={isOverflow ? {
+            boxShadow: [`0 0 0px ${accent}`, `0 0 8px ${accent}`, `0 0 0px ${accent}`],
+          } : { boxShadow: 'none' }}
+          transition={isOverflow ? { duration: 1.4, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.3 }}
+        >
           <div style={{
             height: '100%', borderRadius: 4,
-            width: `${p}%`,
-            background: `linear-gradient(90deg, ${accent}99, ${accent})`,
+            width: `${barPct}%`,
+            background: isOverflow
+              ? `linear-gradient(90deg, ${accent}, ${accent}BB, #FFB7C5)`
+              : `linear-gradient(90deg, ${accent}99, ${accent})`,
             transition: 'width 0.6s ease',
           }} />
+        </motion.div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+          <button
+            onClick={() => onEdit(goal)}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontSize: 11, fontWeight: 800, color: C2.inkSoft,
+              fontFamily: FONT, padding: '2px 0', letterSpacing: '0.3px',
+            }}
+          >
+            Editar objetivo
+          </button>
         </div>
       </div>
     </div>
@@ -230,6 +260,11 @@ export default function GoalSetter() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [formError, setFormError] = useState('');
 
+  // Edit state
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
+  const [editTarget, setEditTarget] = useState(1);
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) { window.location.href = '/login'; return; }
@@ -268,6 +303,25 @@ export default function GoalSetter() {
       setFormError(e instanceof Error ? e.message : 'Error al crear la meta.');
     } finally {
       setCreating(false);
+    }
+  }
+
+  function openEdit(goal: Goal) {
+    setEditingGoal(goal);
+    setEditTarget(goal.target);
+  }
+
+  async function handleSaveEdit() {
+    if (!uid || !editingGoal) return;
+    setSaving(true);
+    try {
+      await updateGoal(uid, editingGoal.goalId, editTarget);
+      setGoals((prev) => prev.map((g) =>
+        g.goalId === editingGoal.goalId ? { ...g, target: editTarget } : g,
+      ));
+      setEditingGoal(null);
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -335,6 +389,7 @@ export default function GoalSetter() {
                 key={goal.goalId}
                 goal={goal}
                 onDelete={handleDelete}
+                onEdit={openEdit}
                 deleting={deletingId === goal.goalId}
               />
             ))
@@ -369,7 +424,101 @@ export default function GoalSetter() {
 
       </div>
 
-      {/* Bottom sheet overlay */}
+      {/* Edit sheet */}
+      <AnimatePresence>
+        {editingGoal && (() => {
+          const editPreview = editingGoal.metric === 'count'
+            ? `${editTarget} sesiones ${editingGoal.type === 'weekly' ? 'esta semana' : 'este mes'}${editingGoal.type === 'weekly' && editTarget > 0 ? ` (~${Math.round(45 * editTarget)} min totales)` : ''}`
+            : `${editTarget} min ${editingGoal.type === 'weekly' ? 'esta semana' : 'este mes'}`;
+          return (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={() => setEditingGoal(null)}
+                style={{ position: 'fixed', inset: 0, background: 'rgba(90,74,92,0.4)', zIndex: 40 }}
+              />
+              <motion.div
+                initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+                style={{
+                  position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
+                  background: '#FFF5F7', borderRadius: '24px 24px 0 0',
+                  padding: '8px 20px 48px', fontFamily: FONT,
+                }}
+              >
+                <div style={{ width: 40, height: 4, background: '#FFD4E0', borderRadius: 2, margin: '8px auto 20px' }} />
+                <div style={{ fontSize: 18, fontWeight: 800, color: C2.ink, marginBottom: 20 }}>
+                  Editar meta
+                </div>
+
+                {/* Read-only period + metric */}
+                <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+                  <div style={{
+                    flex: 1, background: '#fff', borderRadius: 14, padding: '10px 14px',
+                    boxShadow: C2.shadowSoft, textAlign: 'center',
+                  }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: C2.inkSoft, letterSpacing: '0.5px' }}>PERÍODO</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: C2.ink, marginTop: 4 }}>
+                      {editingGoal.type === 'weekly' ? 'Semanal' : 'Mensual'}
+                    </div>
+                  </div>
+                  <div style={{
+                    flex: 1, background: '#fff', borderRadius: 14, padding: '10px 14px',
+                    boxShadow: C2.shadowSoft, textAlign: 'center',
+                  }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: C2.inkSoft, letterSpacing: '0.5px' }}>MÉTRICA</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: C2.ink, marginTop: 4 }}>
+                      {editingGoal.metric === 'count' ? 'Sesiones' : 'Minutos'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Target stepper */}
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: C2.inkSoft, letterSpacing: '0.6px', marginBottom: 8 }}>
+                    NUEVO OBJETIVO
+                  </div>
+                  <Stepper
+                    value={editTarget}
+                    min={editingGoal.metric === 'count' ? 1 : 10}
+                    max={editingGoal.metric === 'count' ? 30 : 600}
+                    step={editingGoal.metric === 'count' ? 1 : 10}
+                    onChange={setEditTarget}
+                  />
+                  <div style={{
+                    marginTop: 10, padding: '10px 14px',
+                    background: 'linear-gradient(135deg, rgba(255,244,195,0.6), rgba(255,183,197,0.4))',
+                    borderRadius: 14, fontSize: 12, color: C2.ink, fontWeight: 600,
+                    display: 'flex', alignItems: 'center', gap: 8,
+                  }}>
+                    <BloomIcon name="sparkle" size={16} />
+                    {editPreview}
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={saving || editTarget === editingGoal.target}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                    padding: '17px 26px', borderRadius: 22, border: 'none',
+                    cursor: saving ? 'default' : 'pointer',
+                    background: C2.ink, color: '#fff', fontSize: 16, fontWeight: 700,
+                    fontFamily: FONT, boxShadow: C2.shadowDark,
+                    opacity: saving || editTarget === editingGoal.target ? 0.6 : 1,
+                    transition: 'opacity 0.2s',
+                  }}
+                >
+                  <BloomIcon name="check" size={20} />
+                  {saving ? 'Guardando…' : 'Guardar cambios'}
+                </button>
+              </motion.div>
+            </>
+          );
+        })()}
+      </AnimatePresence>
+
+      {/* Create sheet */}
       <AnimatePresence>
         {view === 'create' && (
           <>
