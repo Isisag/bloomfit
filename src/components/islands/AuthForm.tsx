@@ -62,7 +62,7 @@ export default function AuthForm() {
           <h1 className="text-2xl font-bold" style={{ color: '#5A4A5C', letterSpacing: '-0.4px' }}>
             {mode === 'login' ? 'Let\'s bloom again' : 'Start blooming'}
           </h1>
-          <p className="text-sm mt-1" style={{ color: '#8E7B92' }}>
+          <p className="text-sm mt-1" style={{ color: '#7A6880' }}>
             {mode === 'login' ? 'Tu flor te extrañó 🌷' : 'Tu flor te está esperando 🌱'}
           </p>
         </div>
@@ -85,7 +85,7 @@ export default function AuthForm() {
               className="flex-1 py-2 text-sm font-bold rounded-xl transition-all"
               style={{
                 background: mode === 'login' ? '#fff' : 'transparent',
-                color: mode === 'login' ? '#5A4A5C' : '#8E7B92',
+                color: mode === 'login' ? '#5A4A5C' : '#7A6880',
                 boxShadow: mode === 'login' ? '0 2px 8px rgba(255,105,180,0.1)' : 'none',
               }}
             >
@@ -96,7 +96,7 @@ export default function AuthForm() {
               className="flex-1 py-2 text-sm font-bold rounded-xl transition-all"
               style={{
                 background: mode === 'register' ? '#fff' : 'transparent',
-                color: mode === 'register' ? '#5A4A5C' : '#8E7B92',
+                color: mode === 'register' ? '#5A4A5C' : '#7A6880',
                 boxShadow: mode === 'register' ? '0 2px 8px rgba(255,105,180,0.1)' : 'none',
               }}
             >
@@ -107,6 +107,7 @@ export default function AuthForm() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
+                htmlFor="auth-email"
                 className="block text-xs font-bold mb-2 ml-1 tracking-wider uppercase"
                 style={{ color: '#FF69B4' }}
               >
@@ -122,6 +123,7 @@ export default function AuthForm() {
               >
                 <BloomIcon name="mail" size={20} />
                 <input
+                  id="auth-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -135,6 +137,7 @@ export default function AuthForm() {
 
             <div>
               <label
+                htmlFor="auth-password"
                 className="block text-xs font-bold mb-2 ml-1 tracking-wider uppercase"
                 style={{ color: '#FF69B4' }}
               >
@@ -150,6 +153,7 @@ export default function AuthForm() {
               >
                 <BloomIcon name="lock" size={20} />
                 <input
+                  id="auth-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -186,7 +190,7 @@ export default function AuthForm() {
 
           <div className="flex items-center my-5 gap-3">
             <div className="flex-1 h-px" style={{ background: '#FFD4E0' }} />
-            <span className="text-xs font-bold" style={{ color: '#8E7B92' }}>o continúa con</span>
+            <span className="text-xs font-bold" style={{ color: '#7A6880' }}>o continúa con</span>
             <div className="flex-1 h-px" style={{ background: '#FFD4E0' }} />
           </div>
 
@@ -207,7 +211,7 @@ export default function AuthForm() {
         </div>
 
         {/* Footer link */}
-        <div className="text-center mt-6 text-sm" style={{ color: '#8E7B92' }}>
+        <div className="text-center mt-6 text-sm" style={{ color: '#7A6880' }}>
           {mode === 'login' ? (
             <>
               ¿Primera vez?{' '}

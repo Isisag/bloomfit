@@ -121,12 +121,12 @@ Ver `src/components/islands/BloomIcons.tsx` para la lista completa. Nombres clav
 | F5 | Dashboard | ✅ |
 | F6 | Timer | ✅ |
 | F7 | Registro workout | ✅ |
-| F8 | Metas | ⬜ |
-| F9 | Flor evolutiva SVG | ⬜ |
-| F10 | Desbloqueables | ⬜ |
-| F11 | Flower Builder | ⬜ |
-| F12 | Mensajes motivacionales | ⬜ |
-| F13 | PWA offline | ⬜ |
-| F14 | Partículas | ⬜ |
-| F15 | Sonidos | ⬜ |
-| F16 | Optimización + A11y | ⬜ |
+| F8 | Metas | ✅ |
+| F9 | Flor evolutiva SVG | ✅ |
+| F10 | Desbloqueables | ✅ |
+| F11 | Flower Builder | ✅ |
+| F12 | Mensajes motivacionales | ✅ |
+| F13 | PWA offline | ✅ |
+| F14 | Partículas | ✅ |
+| F15 | Sonidos | ✅ |
+| F16 | Optimización + A11y | ✅ |

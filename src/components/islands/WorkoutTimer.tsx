@@ -17,7 +17,7 @@ const LIBRE_PRESETS = [0, 5, 10, 15, 20, 30]; // 0 = sin límite
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const C2 = {
   bg: '#FFF5F7', bgTop: '#FFF0F6',
-  ink: '#5A4A5C', inkSoft: '#8E7B92',
+  ink: '#5A4A5C', inkSoft: '#7A6880',
   pink: '#FFB7C5', pinkDeep: '#FF8FAB', pinkSoft: '#FFD4E0',
   shadowSoft: '0 4px 14px rgba(180,120,160,0.08)',
   shadowDark: '0 8px 18px rgba(90,74,92,0.28)',
@@ -102,13 +102,14 @@ function IconRawPause() {
 }
 
 // ─── Control button wrappers ──────────────────────────────────────────────────
-function CtrlBtn({ onClick, size, children, disabled = false }: {
-  onClick?: () => void; size: number; children: React.ReactNode; disabled?: boolean;
+function CtrlBtn({ onClick, size, children, disabled = false, ariaLabel }: {
+  onClick?: () => void; size: number; children: React.ReactNode; disabled?: boolean; ariaLabel?: string;
 }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
+      aria-label={ariaLabel}
       style={{
         width: size, height: size, borderRadius: '50%', border: 'none',
         background: '#fff', boxShadow: C2.shadowSoft,
@@ -123,10 +124,11 @@ function CtrlBtn({ onClick, size, children, disabled = false }: {
   );
 }
 
-function CenterBtn({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+function CenterBtn({ onClick, children, ariaLabel }: { onClick: () => void; children: React.ReactNode; ariaLabel: string }) {
   return (
     <button
       onClick={onClick}
+      aria-label={ariaLabel}
       style={{
         width: 86, height: 86, borderRadius: '50%', border: 'none',
         background: C2.ink, boxShadow: '0 12px 28px rgba(90,74,92,0.35)',
@@ -376,8 +378,9 @@ export default function WorkoutTimer() {
                   key={m.id}
                   onClick={() => handleModeSwitch(m.id)}
                   disabled={isRunning}
+                  aria-pressed={active}
                   style={{
-                    padding: '8px 18px', borderRadius: 11, fontSize: 12, fontWeight: 800,
+                    padding: '0 18px', minHeight: 44, borderRadius: 11, fontSize: 12, fontWeight: 800,
                     border: 'none', cursor: isRunning ? 'default' : 'pointer',
                     background: active ? C2.ink : 'transparent',
                     color: active ? '#fff' : C2.inkSoft,
@@ -406,8 +409,9 @@ export default function WorkoutTimer() {
                 <button
                   key={min}
                   onClick={() => { setCustomMs(ms); if (!isReady) handleReset(); }}
+                  aria-pressed={active}
                   style={{
-                    padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 800,
+                    padding: '0 14px', minHeight: 44, borderRadius: 20, fontSize: 12, fontWeight: 800,
                     border: 'none', cursor: 'pointer', fontFamily: FONT,
                     background: active ? C2.pinkSoft : '#fff',
                     color: active ? C2.pinkDeep : C2.inkSoft,
@@ -547,17 +551,20 @@ export default function WorkoutTimer() {
             gap: 22, padding: '0 0 28px',
           }}>
             {/* Left: stop */}
-            <CtrlBtn size={56} onClick={isReady ? undefined : handleStop} disabled={isReady}>
+            <CtrlBtn size={56} onClick={isReady ? undefined : handleStop} disabled={isReady} ariaLabel="Detener entrenamiento">
               <IconStop size={32} />
             </CtrlBtn>
 
             {/* Center: play / pause / resume */}
-            <CenterBtn onClick={isRunning ? handlePause : isPaused ? handleResume : handleStart}>
+            <CenterBtn
+              onClick={isRunning ? handlePause : isPaused ? handleResume : handleStart}
+              ariaLabel={isRunning ? 'Pausar' : isPaused ? 'Continuar' : 'Iniciar entrenamiento'}
+            >
               {isRunning ? <IconRawPause /> : <IconRawPlay />}
             </CenterBtn>
 
             {/* Right: skip to complete (running/paused) or disabled */}
-            <CtrlBtn size={56} onClick={isReady ? undefined : handleStop} disabled={isReady}>
+            <CtrlBtn size={56} onClick={isReady ? undefined : handleStop} disabled={isReady} ariaLabel="Completar entrenamiento">
               <IconSkip size={32} />
             </CtrlBtn>
           </div>

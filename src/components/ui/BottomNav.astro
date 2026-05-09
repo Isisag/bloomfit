@@ -88,7 +88,7 @@ const items: { id: NavItem; label: string; href: string }[] = [
           </span>
           <span
             class="bloom-nav-label text-xs font-bold"
-            style={isActive ? 'color: #FF8FAB;' : 'color: #8E7B92;'}
+            style={isActive ? 'color: #FF8FAB;' : 'color: #7A6880;'}
           >{item.label}</span>
         </a>
       );
@@ -130,7 +130,7 @@ const items: { id: NavItem; label: string; href: string }[] = [
         link.style.borderRadius = '0';
         link.removeAttribute('aria-current');
         if (icon) icon.style.opacity = '0.55';
-        if (label) label.style.color = '#8E7B92';
+        if (label) label.style.color = '#7A6880';
       }
     });
   }

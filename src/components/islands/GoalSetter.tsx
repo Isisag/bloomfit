@@ -10,7 +10,7 @@ import { BloomIcon } from './BloomIcons';
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const C2 = {
   bg: '#FFF5F7',
-  ink: '#5A4A5C', inkSoft: '#8E7B92',
+  ink: '#5A4A5C', inkSoft: '#7A6880',
   pink: '#FFB7C5', pinkDeep: '#FF8FAB', pinkSoft: '#FFD4E0',
   lavenderSoft: '#EBDDFC', mintSoft: '#DEF5E6',
   shadowSoft: '0 4px 14px rgba(180,120,160,0.08)',
