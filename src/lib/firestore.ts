@@ -23,6 +23,7 @@ export interface UserProfile {
   weeklyStreak?: number;
   unlockedParts?: string[];
   pendingUnlocks?: string[];
+  soundEnabled?: boolean;
 }
 
 export interface Goal {
@@ -162,6 +163,10 @@ export async function deactivateGoal(uid: string, goalId: string): Promise<void>
 
 export async function updateGoal(uid: string, goalId: string, target: number): Promise<void> {
   await updateDoc(doc(db, 'users', uid, 'goals', goalId), { target });
+}
+
+export async function updateSoundEnabled(uid: string, val: boolean): Promise<void> {
+  await updateDoc(doc(db, 'users', uid), { soundEnabled: val });
 }
 
 export async function updateFlowerConfig(

@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import BottomNav from '@/components/ui/BottomNav.astro';
+import ParticleCanvas from '@/components/islands/ParticleCanvas';
 import { ClientRouter } from 'astro:transitions';
 
 type NavItem = 'home' | 'train' | 'garden' | 'me';
@@ -20,7 +21,11 @@ const { title = 'BloomFit', activeNav = 'home' } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Tu flor crece cuando tú creces" />
     <title>{title}</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#FFB7C5" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/pwa-icon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -28,10 +33,21 @@ const { title = 'BloomFit', activeNav = 'home' } = Astro.props;
     <script is:inline>
       const t = localStorage.getItem('bloomfit-theme') || 'sakura';
       document.documentElement.setAttribute('data-theme', t);
+      const _themeColors = { sakura: '#FFB7C5', lavender: '#D8BFD8', sky: '#B0E0E6', cream: '#F5DEB3' };
+      const _meta = document.querySelector('meta[name="theme-color"]');
+      if (_meta) _meta.setAttribute('content', _themeColors[t] || '#FFB7C5');
     </script>
   </head>
   <body style="padding-bottom: 88px;">
+    <ParticleCanvas client:media="(min-width: 320px)" />
     <slot />
     <BottomNav active={activeNav} />
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js', { scope: '/' });
+        });
+      }
+    </script>
   </body>
 </html>

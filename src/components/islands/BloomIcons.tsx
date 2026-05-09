@@ -12,7 +12,7 @@ const I = {
   mintSoft: '#D4F2DE', mintMid: '#A8DEBA', mintDeep: '#6FBF8E',
   butterSoft: '#FFF1B8', butterMid: '#FFE38A', butterDeep: '#E8B948',
   peachSoft: '#FFE0CC', peachMid: '#FFC299', peachDeep: '#E89968',
-  ink: '#5A4A5C', inkSoft: '#8E7B92',
+  ink: '#5A4A5C', inkSoft: '#7A6880',
   white: '#FFFFFF', cream: '#FFF8EE',
   leaf: '#A8D5BA', leafDeep: '#7FB89A',
   stroke: '#4A3D4D',

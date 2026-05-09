@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { onAuthStateChanged, auth } from '@/lib/auth';
 import {
   getUserProfile, getActiveGoals, getRecentWorkouts,
@@ -8,6 +8,7 @@ import type { UserProfile, Goal, Workout } from '@/lib/firestore';
 import { FLOWER_PARTS, resolvePetalSwatch } from '@/lib/flower-parts';
 import type { FlowerPart } from '@/lib/flower-parts';
 import { getMotivationalMessage, detectDashboardContext } from '@/lib/messages';
+import { playSound } from '@/lib/sounds';
 import FlowerAvatar from './FlowerAvatar';
 import UnlockModal from './UnlockModal';
 import { BloomIcon, IconBadge } from './BloomIcons';
@@ -72,7 +73,7 @@ function WorkoutRow({ workout, bg, deep }: { workout: Workout; bg: string; deep:
         <div className="text-sm font-bold truncate capitalize" style={{ color: '#5A4A5C' }}>
           {workout.type}
         </div>
-        <div className="text-xs" style={{ color: '#8E7B92' }}>{timeLabel}</div>
+        <div className="text-xs" style={{ color: '#7A6880' }}>{timeLabel}</div>
       </div>
       <div
         className="text-xs font-bold px-3 py-1 rounded-xl"
@@ -101,6 +102,19 @@ export default function DashboardContent() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
   const [pendingParts, setPendingParts] = useState<FlowerPart[]>([]);
+  const goalSoundFired = useRef(false);
+
+  useEffect(() => {
+    if (loading || goalSoundFired.current) return;
+    const savedJustNow = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('saved') === '1';
+    if (!savedJustNow) return;
+    const primaryGoal = goals.find((g) => g.type === 'weekly') ?? goals[0] ?? null;
+    const pct = primaryGoal ? Math.round((primaryGoal.current / primaryGoal.target) * 100) : 0;
+    if (pct >= 100) {
+      goalSoundFired.current = true;
+      playSound('goal');
+    }
+  }, [loading, goals]);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -168,7 +182,7 @@ export default function DashboardContent() {
       {/* Header */}
       <div className="flex items-start justify-between px-6 pt-12 pb-2">
         <div>
-          <div className="text-xs font-bold" style={{ color: '#8E7B92' }}>{todayLabel()}</div>
+          <div className="text-xs font-bold" style={{ color: '#7A6880' }}>{todayLabel()}</div>
           <h1 className="text-2xl font-bold mt-1" style={{ color: '#5A4A5C', letterSpacing: '-0.4px' }}>
             ¡Hola, {displayName}!{' '}
             <span style={{ display: 'inline-block', animation: 'wavingHand 2s ease-in-out infinite' }}>👋</span>
@@ -238,7 +252,7 @@ export default function DashboardContent() {
         <ProgressRing pct={pct} size={60} deep={T.deep} />
         <div className="flex-1">
           <div className="flex items-center justify-between">
-            <div className="text-xs font-bold tracking-wide" style={{ color: '#8E7B92' }}>ESTA SEMANA</div>
+            <div className="text-xs font-bold tracking-wide" style={{ color: '#7A6880' }}>ESTA SEMANA</div>
             <a href="/goals" className="text-xs font-bold" style={{ color: T.deep, textDecoration: 'none' }}>
               Ver metas →
             </a>
@@ -293,7 +307,7 @@ export default function DashboardContent() {
           >
             <div className="text-3xl mb-2">🌱</div>
             <div className="text-sm font-bold" style={{ color: '#5A4A5C' }}>Aún no hay entrenamientos</div>
-            <div className="text-xs mt-1" style={{ color: '#8E7B92' }}>¡Tu primera sesión hará crecer la flor!</div>
+            <div className="text-xs mt-1" style={{ color: '#7A6880' }}>¡Tu primera sesión hará crecer la flor!</div>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
