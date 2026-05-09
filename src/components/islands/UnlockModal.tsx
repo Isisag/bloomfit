@@ -28,7 +28,7 @@ interface UnlockModalProps {
 
 export default function UnlockModal({ parts, onDismiss }: UnlockModalProps) {
   useEffect(() => {
-    if (parts.length > 0) playSound('unlock');
+    playSound('unlock');
   }, []);
 
   if (parts.length === 0) return null;

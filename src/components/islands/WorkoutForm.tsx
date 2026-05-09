@@ -212,10 +212,7 @@ export default function WorkoutForm() {
   }, []);
 
   async function handleSave() {
-    if (!uid) {
-      console.error('[WorkoutForm] handleSave: uid is null, auth not resolved yet');
-      return;
-    }
+    if (!uid) return;
     setSaving(true);
     setError('');
     try {
@@ -223,8 +220,7 @@ export default function WorkoutForm() {
       await updateGoalProgress(uid, duration);
       await playSound('complete');
       window.location.href = '/?saved=1';
-    } catch (e) {
-      console.error('[WorkoutForm] save failed:', e);
+    } catch {
       setError('No se pudo guardar. Intenta de nuevo.');
       setSaving(false);
     }

@@ -40,7 +40,7 @@ export function getSoundEnabled(): boolean {
 export function setSoundEnabled(val: boolean): void {
   try {
     localStorage.setItem('bloomfit-sound', String(val));
-  } catch {}
+  } catch { /* localStorage unavailable */ }
 }
 
 export async function playSound(type: SoundType): Promise<void> {

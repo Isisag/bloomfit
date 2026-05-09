@@ -19,12 +19,11 @@ const FONT = `'Quicksand','Nunito',-apple-system,sans-serif`;
 
 export default function MePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [soundOn, setSoundOn] = useState(true);
+  const [soundOn, setSoundOn] = useState(() => getSoundEnabled());
   const [uid, setUid] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setSoundOn(getSoundEnabled());
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) { window.location.href = '/login'; return; }
       setUid(user.uid);
