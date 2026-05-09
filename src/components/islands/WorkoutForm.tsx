@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged, auth } from '@/lib/auth';
 import { saveWorkout, updateGoalProgress } from '@/lib/firestore';
+import { playSound } from '@/lib/sounds';
 import { Timestamp } from 'firebase/firestore';
 import KawaiiFlower from './KawaiiFlower';
 import { BloomIcon } from './BloomIcons';
@@ -8,7 +9,7 @@ import { BloomIcon } from './BloomIcons';
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const C2 = {
   bg: '#FFF5F7',
-  ink: '#5A4A5C', inkSoft: '#8E7B92',
+  ink: '#5A4A5C', inkSoft: '#7A6880',
   pink: '#FFB7C5', pinkDeep: '#FF8FAB', pinkSoft: '#FFD4E0',
   lavenderSoft: '#EBDDFC', skySoft: '#DCEBFA', mintSoft: '#DEF5E6',
   butter: '#FFF4C3', peachSoft: '#FFE0CC', butterSoft: '#FFF1B8',
@@ -220,6 +221,7 @@ export default function WorkoutForm() {
     try {
       await saveWorkout(uid, { type: workoutType, duration, date: Timestamp.now(), mood: mood ?? undefined });
       await updateGoalProgress(uid, duration);
+      await playSound('complete');
       window.location.href = '/?saved=1';
     } catch (e) {
       console.error('[WorkoutForm] save failed:', e);
@@ -317,24 +319,28 @@ export default function WorkoutForm() {
                 <div style={{ fontSize: 11, color: C2.inkSoft, fontWeight: 800 }}>MINUTOS</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
                   <button
+                    aria-label="Reducir duración"
                     onClick={() => setDuration((d) => Math.max(1, d - 5))}
                     style={{
-                      width: 28, height: 28, borderRadius: '50%', border: 'none',
+                      width: 44, height: 44, borderRadius: '50%', border: 'none',
                       background: C2.pinkSoft, color: C2.pinkDeep, fontSize: 18, fontWeight: 800,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       cursor: 'pointer', lineHeight: '1', padding: 0, fontFamily: FONT,
+                      flexShrink: 0,
                     }}
                   >−</button>
                   <span style={{ fontSize: 30, fontWeight: 800, color: C2.ink, lineHeight: 1, minWidth: 36, textAlign: 'center' }}>
                     {duration}
                   </span>
                   <button
+                    aria-label="Aumentar duración"
                     onClick={() => setDuration((d) => Math.min(240, d + 5))}
                     style={{
-                      width: 28, height: 28, borderRadius: '50%', border: 'none',
+                      width: 44, height: 44, borderRadius: '50%', border: 'none',
                       background: C2.pinkSoft, color: C2.pinkDeep, fontSize: 18, fontWeight: 800,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       cursor: 'pointer', lineHeight: '1', padding: 0, fontFamily: FONT,
+                      flexShrink: 0,
                     }}
                   >+</button>
                   <span style={{ fontSize: 14, color: C2.inkSoft, fontWeight: 600 }}>min</span>

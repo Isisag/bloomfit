@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { FlowerPart } from '@/lib/flower-parts';
+import { playSound } from '@/lib/sounds';
 
 const C = {
   ink: '#5A4A5C',
-  inkSoft: '#8E7B92',
+  inkSoft: '#7A6880',
   pink: '#FFB7C5',
   pinkDeep: '#FF8FAB',
   pinkSoft: '#FFD4E0',
@@ -25,6 +27,10 @@ interface UnlockModalProps {
 }
 
 export default function UnlockModal({ parts, onDismiss }: UnlockModalProps) {
+  useEffect(() => {
+    if (parts.length > 0) playSound('unlock');
+  }, []);
+
   if (parts.length === 0) return null;
 
   return (
